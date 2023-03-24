@@ -1,23 +1,23 @@
 import csv
 
-path = "PyPoll/Resources/election_data.csv"
+# Locations of the input and output files
+input_path = "Resources/election_data.csv"
+output_path = "analysis/election_results"
 
+# Declares lists representing input data columns and final values
 voterID = []
 county = []
 candidate = []
 cand_list = []
+votes = []
+percents = []
 
+# Variable for final values
 total_votes = 0
-CCS_votes = 0
-DD_votes = 0
-RAD_votes = 0
-CCS_percent = 0
-DD_percent = 0
-RAD_percent = 0
 winner = ""
 
-
-with open(path) as csvfile:
+# Reads the election data and saves the columns into lists
+with open(input_path) as csvfile:
     csvreader = csv.reader(csvfile, delimiter=",")
     csvheader = next(csvreader)
 
@@ -26,21 +26,60 @@ with open(path) as csvfile:
         county.append(row[1])
         candidate.append(row[2])
 
+# Creates a list of unique candidates
 for name in candidate:
     if name not in cand_list:
         cand_list.append(name)
-    
+
+# Calculates total number of votes cast based on voter IDs
 total_votes = len(voterID)
-CCS_votes = candidate.count(cand_list[0])
-DD_votes = candidate.count(cand_list[1])
-RAD_votes = candidate.count(cand_list[2])
-CCS_percent = round(CCS_votes / total_votes * 100, 3)
-DD_percent = round(DD_votes/ total_votes * 100, 3)
-RAD_percent = round(RAD_votes / total_votes * 100, 3)
 
+# Finds the number of votes each candidate received and its percentage of all votes cast
+for cand in range(len(cand_list)):
+    vote = candidate.count(cand_list[cand])
+    votes.append(vote)
+    percent = round(vote / total_votes * 100, 3)
+    percents.append(percent)
 
-print(total_votes)
-print(CCS_votes, DD_votes, RAD_votes)
-print(CCS_percent, DD_percent, RAD_percent)
-print(cand_list)
+# Finds the winner of the election by candidate with the largest number of votes
+winner_index = votes.index(max(votes))
+winner = cand_list[winner_index]
 
+# Formats for election analysis
+st_title = "Election Results"
+st_line = "-------------------------"
+st_total_votes = (f"Total Votes {total_votes}")
+st_winner = (f"Winner: {winner}")
+
+# Writes election analysis to election_results text file and prints analysis to terminal 
+with open(output_path, 'w') as txtfile:
+    txtfile.write(st_title)
+    txtfile.write("\n")
+    txtfile.write(st_line)
+    txtfile.write("\n")
+    txtfile.write(st_total_votes)
+    txtfile.write("\n")
+    txtfile.write(st_line)
+    txtfile.write("\n")
+
+    print(st_title)
+    print(st_line)
+    print(st_total_votes)
+    print(st_line)
+
+    # Prints each candidate's vote percentage and total votes received
+    # Loop allows for a dynamic number of candidates
+    for print_candidate in range(len(cand_list)):
+        candidate_stats = (f"{cand_list[print_candidate]}: {percents[print_candidate]}% ({votes[print_candidate]})")
+        txtfile.write(candidate_stats + "\n")
+        print(candidate_stats)
+    
+    txtfile.write(st_line)
+    txtfile.write("\n")
+    txtfile.write(st_winner)
+    txtfile.write("\n")
+    txtfile.write(st_line)
+
+    print(st_line)
+    print(st_winner)
+    print(st_line)
